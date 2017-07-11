@@ -1,0 +1,23 @@
+Installing AppLariat API Cert into Java Keystore
+
+1-	In Chrome browser go to https://api.aplariat.ip/v1/deployments
+2-	In chrome configuration select More Tools, Developer Tools and click on the security tab
+3-	Click on the View Certificate button and in the dialog box select Details.
+4-	Select the Copy To File button and click on Next.
+5-	Ensure the format DER encoded binary X.509 (.CER) is selected and click on Next
+6-	Save the file to a known location (call it applariat_api_cert)
+7-	Download the opensource tool Portecle
+8-	In windows right click the Portecle icon and select “Run as Administrator” 
+9-	Next we need to find out which JVM is being used in Eclipse
+10-	Go to Windows, Preferences in Eclipse and select Java, Installed JRE’s. Note the JRE that is being used.
+11-	In Portacle go to File, Open Keystore File and go to the directory where your JRE is installed and from there go to Lib/Security and select the file cacerts.
+12-	It will ask you for the password to this file. If you have never set a password, then the default password is changeit. 
+13-	Now go to Tools, Import Trusted Certificates and select the applariat_api_cert file you saved previously.
+14-	Click on a series of OK’s and Yes’s to import the cert into your keystore
+15-	Now go to File, Save Keystore
+
+Configuring Plugin for Eclipse
+1-	The following three environmental variables must be set in in your OS
+a.	APL_API_BASE_URL=https://api.applariat.io/v1
+b.	APL_SVC_USERNAME=<username>
+c.	APL_SVC_PASSWORD=<password>
