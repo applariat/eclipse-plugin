@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Deploy Plugin
+Bundle-SymbolicName: AppLariat_Eclipse_Plugin;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: EXAMPLE
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime;bundle-version="3.12.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ClassPath: .,
+ json-simple-1.1.1.jar
+Export-Package: com.applariat.plugin.eclipse.handlers,
+ org.json.simple,
+ org.json.simple.parser
