@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="plugins/AppLariat_Eclipse_Plugin_1.0.0.201707111054.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/mazda/.p2/pool/plugins/org.eclipse.core.runtime_3.12.0.v20160606-1342.jar" sourcepath="C:/Users/mazda/.p2/pool/plugins/org.eclipse.core.runtime_3.12.0.v20160606-1342.jar">
+		<accessrules>
+			<accessrule kind="discouraged" pattern="org/eclipse/core/internal/preferences/legacy/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/core/internal/runtime/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/core/runtime/*"/>
+			<accessrule ignoreifbetter="true" kind="nonaccessible" pattern="**/*"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
