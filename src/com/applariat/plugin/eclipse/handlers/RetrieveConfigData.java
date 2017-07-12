@@ -175,7 +175,7 @@ public class RetrieveConfigData implements IRunnableWithProgress {
       		monitor.done(); 
         } catch (Exception e) {
         	setError(true);
-        	setErrorMessage("An error occured during configuration: "+e.toString());
+        	setErrorMessage("An error occured during configuration: "+e.getStackTrace());
         	e.printStackTrace();
         	throw new InvocationTargetException(e); 
         }
