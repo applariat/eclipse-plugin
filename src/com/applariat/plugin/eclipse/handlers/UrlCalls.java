@@ -17,23 +17,30 @@ import org.json.simple.parser.JSONParser;
 public class UrlCalls {
 	private final static String apl_api_base_url = "$APL_API_BASE_URL";
 	
+	public static boolean isEnvVarsSet() {
+		if (System.getenv("APL_SVC_USERNAME")==null || (System.getenv("APL_SVC_PASSWORD")==null)) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 	public static String replaceApiHostPlaceholder(String url) {
 		if(url.contains(apl_api_base_url)) {
-			return url.replace(apl_api_base_url, System.getenv("APL_API_BASE_URL"));
+			if (System.getenv("APL_API_BASE_URL")!=null) {
+				return url.replace(apl_api_base_url, System.getenv("APL_API_BASE_URL"));
+			} else {
+				return "https://api.applariat.io/v1";
+			}
 		}
 		return url;
 	}
 	
-	public static String urlConnectRequestToken() {
-		String baseUrl = System.getenv("APL_API_BASE_URL") + "/request_token";
+	public static String urlConnectRequestToken(String apiUrl, String authStringEnc) {
+		String baseUrl = apiUrl + "/request_token";
 		HttpURLConnection connection = null;
 		try {
 			connection = (HttpURLConnection)new URL(baseUrl).openConnection();
 			connection.setRequestMethod("POST");
-			String svc_user = System.getenv("APL_SVC_USERNAME");
-			String svc_passwd = System.getenv("APL_SVC_PASSWORD");
-			String authString = svc_user + ":" + svc_passwd;
-			String authStringEnc = Base64.getEncoder().encodeToString(authString.getBytes(StandardCharsets.UTF_8));
 			connection.setRequestProperty("Authorization", "Basic " + authStringEnc);
 			InputStream response = connection.getInputStream();
 			String responseString = getStringFromInputStream(response);

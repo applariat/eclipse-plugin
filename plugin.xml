@@ -14,7 +14,7 @@
             id="com.applariat.plugin.eclipse.commands.deployApp">
       </command>
       <command
-            name="App URL"
+            name="Get App URL"
             categoryId="com.applariat.plugin.eclipse.commands.category"
             id="com.applariat.plugin.eclipse.commands.appUrl">
       </command>
@@ -22,8 +22,7 @@
             name="Configure"
             categoryId="com.applariat.plugin.eclipse.commands.category"
             id="com.applariat.plugin.eclipse.commands.configure">
-      </command>
-      
+      </command>      
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -39,7 +38,6 @@
             commandId="com.applariat.plugin.eclipse.commands.configure"
             class="com.applariat.plugin.eclipse.handlers.ConfigHandler">
       </handler>
-      
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -87,7 +85,7 @@
                   commandId="com.applariat.plugin.eclipse.commands.configure"
                   mnemonic="S"
                   id="com.applariat.plugin.eclipse.menus.configure">
-            </command>
+            </command>            
          </menu>
       </menuContribution>
       <menuContribution

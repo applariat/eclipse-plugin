@@ -2,14 +2,9 @@ package com.applariat.plugin.eclipse.handlers;
 
 // Written by: Mazda Marvasti, AppLariat Corp.
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -26,7 +21,35 @@ public class ConfigHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);		
 	
-		RetrieveConfigData rcd = new RetrieveConfigData();
+		RedeployData rdd = RedeployData.readRedeployDataFromFileForAuth();
+		boolean needCredentials = false;
+		if (rdd!=null && rdd.getAuthToken()!=null) { // now get the token for this auth
+			RedeployData.initToken(rdd);
+			if (rdd.getJwtToken()==null) { // username/password is invalid
+				needCredentials = true;										
+			}
+		} else { // need to ask for username and password
+			needCredentials=true;
+		}
+
+		if (needCredentials) {
+			do {
+				MyLoginAreaDialog lDialog = new MyLoginAreaDialog(window.getShell());
+				lDialog.create();
+				lDialog.open();
+				String authString = lDialog.getUsername() + ":" + lDialog.getPassword();
+				String authStringEnc = Base64.getEncoder().encodeToString(authString.getBytes(StandardCharsets.UTF_8));
+				rdd = new RedeployData();
+				rdd.setAuthToken(authStringEnc);
+				// now validate this by getting a jwtToken. If not valid send them back to enter their username and password
+				RedeployData.initToken(rdd);
+				if (rdd.getJwtToken()==null) {
+					MessageDialog.openInformation(window.getShell(),"appLariat", "Invalid username/password. Please re-enter you appLariat credentials.");
+				}
+			} while(rdd.getJwtToken()==null);
+		}
+		
+		RetrieveConfigData rcd = new RetrieveConfigData(rdd);
 	    ProgressMonitorDialog pmd = new ProgressMonitorDialog(window.getShell());
 	    try {
 	    	pmd.run(true, true, rcd);
@@ -51,7 +74,7 @@ public class ConfigHandler extends AbstractHandler {
 			}
 			
 			// now do the first deploy of the application with the override
-			ConfigValidateProgressBar cvpb = new ConfigValidateProgressBar(dialog.getInitReleaseData(), rcd.getJwtToken());
+			ConfigValidateProgressBar cvpb = new ConfigValidateProgressBar(dialog.getInitReleaseData(), rdd.getApiUrl(), rdd.getJwtToken());
 			ProgressMonitorDialog pmd1 = new ProgressMonitorDialog(window.getShell());
 		    try {
 		    	pmd1.run(true, true, cvpb);
@@ -59,23 +82,11 @@ public class ConfigHandler extends AbstractHandler {
 		    	e.printStackTrace();
 		    }
 		    
-			AppLariatEclipsePlugin aep = new AppLariatEclipsePlugin();
-			File configFile = aep.getStateLocation().append(aep.getFilename()).toFile();
 			RedeployData redeployData = cvpb.getRedeployData();
-			
-			try (
-			    OutputStream file = new FileOutputStream(configFile);
-			    OutputStream buffer = new BufferedOutputStream(file);
-			    ObjectOutput output = new ObjectOutputStream(buffer);
-			){
-			    output.writeObject(redeployData);
-			}  catch(IOException ex){
-				MessageDialog.openInformation(
-						window.getShell(),
-						"appLariat",
-						"Unable to write config data :  "+ex.toString());
-				return null;
-			}
+			redeployData.setAuthToken(rdd.getAuthToken());
+			redeployData.setJwtToken(rdd.getJwtToken());
+			redeployData.setApiUrl(rdd.getApiUrl());
+			RedeployData.writeRedeployDataToFile(redeployData, window);
 
 			MessageDialog.openInformation(
 					window.getShell(),

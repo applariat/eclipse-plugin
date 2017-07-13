@@ -72,26 +72,15 @@ public class ProgressBar implements IRunnableWithProgress {
 	}
 
 	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-	    String baseUrl="$APL_API_BASE_URL";
+	    
         try { 
         	JSONParser parser = new JSONParser();
         	
         	monitor.beginTask("Deploying Application", 100); 
         
-        	monitor.subTask("Connecting to appLariat API Service ...");
-        	baseUrl = UrlCalls.replaceApiHostPlaceholder(baseUrl);
-        	String jwtToken = UrlCalls.urlConnectRequestToken();
-        	if (jwtToken==null || jwtToken.length()<2) {
-        		setError(true);
-        		setErrorMessage("Unable to aquire authorization to access the API. Please check your credentials or connection.");
-        		monitor.done(); 
-        		return;
-        	}
-        	monitor.worked(5); 
- 
         	monitor.subTask("Deploying application ...");
           	String query = "{\"data\": {\"command\": \"override\",\"components\": [{\"stack_component_id\": \""+rdd.getArtifactData().getStackComponentId()+"\",\"services\": [{\"component_service_id\": \""+rdd.getArtifactData().getComponentServiceId()+"\",\"build\": {\"buildvars\": [{\"key\": \"REBUILD_NUM\", \"value\":\""+rdd.getNewBuildHash()+"\"}]}}]}]}}";
-          	String deployData = UrlCalls.urlConnectPut(baseUrl+"/deployments/"+rdd.getDeployData().getId(), query, jwtToken);
+          	String deployData = UrlCalls.urlConnectPut(rdd.getApiUrl()+"/deployments/"+rdd.getDeployData().getId(), query, rdd.getJwtToken());
           	if (deployData==null) {
           		setError(true);
           		setErrorMessage("Unable to find existing deployment.");
@@ -106,7 +95,7 @@ public class ProgressBar implements IRunnableWithProgress {
       			return;
           	}
 
-      		monitor.worked(20);
+      		monitor.worked(25);
       		
       		if (!isSilentDeploy()) {
       			// now wait until you get confirmation that the app was redeployed
@@ -116,7 +105,7 @@ public class ProgressBar implements IRunnableWithProgress {
       			do {      	
       				Thread.sleep(20000);
       				count++;
-      				deployData = UrlCalls.urlConnectGet(baseUrl+"/deployments/"+rdd.getDeployData().getId(),"", jwtToken);
+      				deployData = UrlCalls.urlConnectGet(rdd.getApiUrl()+"/deployments/"+rdd.getDeployData().getId(),"", rdd.getJwtToken());
       				if (deployData!=null) {
       					jo1 = (JSONObject)parser.parse(deployData);
       					if(((JSONObject)jo1.get("data")).toJSONString().length()>5) {

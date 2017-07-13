@@ -106,26 +106,17 @@ public class ProgressBarUrl implements IRunnableWithProgress {
 	}
 
 	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-	    String baseUrl="$APL_API_BASE_URL";
+	    
         try { 
         	JSONParser parser = new JSONParser();
         	
         	monitor.beginTask("Retrieving Application Information", 100); 
         
-        	monitor.subTask("Connecting to appLariat API Service ...");
-        	baseUrl = UrlCalls.replaceApiHostPlaceholder(baseUrl);
-        	String jwtToken = UrlCalls.urlConnectRequestToken();
-        	if (jwtToken==null || jwtToken.length()<2) {
-        		setError(true);
-        		setErrorMessage("Unable to aquire authorization to access the API. Please check your credentials or connection.");
-        		monitor.done(); 
-        		return;
-        	}
-        	monitor.worked(20); 
+        	monitor.worked(25); 
         	
         	monitor.subTask("Retrieving deployment information ...");
         	String query = "";
-          	String deployData = UrlCalls.urlConnectGet(baseUrl+"/deployments/"+rdd.getDeployData().getId(), query, jwtToken);
+          	String deployData = UrlCalls.urlConnectGet(rdd.getApiUrl()+"/deployments/"+rdd.getDeployData().getId(), query, rdd.getJwtToken());
           	JSONObject jo1 = (JSONObject)parser.parse(deployData);
           	String state = null;
           	if (jo1.get("data")!=null ) {

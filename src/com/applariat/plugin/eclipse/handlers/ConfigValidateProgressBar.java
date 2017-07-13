@@ -15,12 +15,14 @@ public class ConfigValidateProgressBar implements IRunnableWithProgress {
 	private boolean error=false;
 	private String errorMessage;
 	private String jwtToken;
+	private String apiUrl;
 	
 	private RedeployData redeployData = new RedeployData();
 	
-	public ConfigValidateProgressBar(InitialReleaseData rd, String jwtToken) {
+	public ConfigValidateProgressBar(InitialReleaseData rd, String apiUrl, String jwtToken) {
 		this.rd=rd;
 		this.jwtToken=jwtToken;
+		this.apiUrl=apiUrl;
 	} 
 	
 	public boolean isError() {
@@ -63,10 +65,16 @@ public class ConfigValidateProgressBar implements IRunnableWithProgress {
 		this.redeployData = redeployData;
 	}
 
-	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-	    String baseUrl="$APL_API_BASE_URL";
+	public String getApiUrl() {
+		return apiUrl;
+	}
+
+	public void setApiUrl(String apiUrl) {
+		this.apiUrl = apiUrl;
+	}
+
+	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {	    
         try { 
-        	baseUrl = UrlCalls.replaceApiHostPlaceholder(baseUrl);
         	JSONParser parser = new JSONParser();
         	
         	monitor.beginTask("Initializing Application", 100); 
@@ -75,7 +83,7 @@ public class ConfigValidateProgressBar implements IRunnableWithProgress {
         	// Now register the new artifact and get its ID.
       		String artUrl = RedeployData.getNewLocUrl(rd.getNewArtifactLocation(), rd.getRepositoryOwner(), rd.getRepositoryName(), rd.getRepositoryBranch());
         	String query = "{\"data\":{\"name\":\""+artUrl+"\", \"version\":\"1.0\", \"artifact_name\":\""+artUrl+"\", \"stack_id\":\""+rd.getRelease().getStackId()+"\", \"stack_artifact_type\":\"code\", \"loc_artifact_id\":\"la-url-apl\", \"metaData\": {\"display_name\":\""+rd.getRepositoryBranch()+"\"}}}";
-        	String registerArtifactData = UrlCalls.urlConnectPost(baseUrl+"/stack_artifacts", query, jwtToken);
+        	String registerArtifactData = UrlCalls.urlConnectPost(getApiUrl()+"/stack_artifacts", query, getJwtToken());
         	if (registerArtifactData==null) {
         		setError(true);
         		setErrorMessage("Unable to register new artifact.");
@@ -105,7 +113,7 @@ public class ConfigValidateProgressBar implements IRunnableWithProgress {
         	monitor.subTask("Delete Previous Deployment ...");
         	// first delete any existing deployments with the same name
         	query = "name="+rd.getRepositoryBranch()+"-deploy";
-          	String deployData = UrlCalls.urlConnectGet(baseUrl+"/deployments", query, jwtToken);
+          	String deployData = UrlCalls.urlConnectGet(getApiUrl()+"/deployments", query, getJwtToken());
           	jo1 = (JSONObject)parser.parse(deployData);
           	if (jo1.get("data")!=null ) { // that means there are deployments there with exactly the same name. Need to delete those deployments. In reality there should only be one with this same exact name.
           		JSONArray ja = (JSONArray)jo1.get("data");
@@ -113,14 +121,14 @@ public class ConfigValidateProgressBar implements IRunnableWithProgress {
           			monitor.subTask("Delete Previous Deployment (may take some time)...");
           			for (int i=0; i<ja.size(); i++) {
           				String id = (String)((JSONObject)ja.get(i)).get("id");
-          				String deleteData = UrlCalls.urlConnectDelete(baseUrl+"/deployments/"+id, "", jwtToken);
+          				String deleteData = UrlCalls.urlConnectDelete(getApiUrl()+"/deployments/"+id, "", getJwtToken());
           				// now get confirmation that the job has been deleted before moving forward
           				int count=0;
           				boolean finished=false;
           				do {
           					Thread.sleep(20000);
           					count++;
-          					deleteData = UrlCalls.urlConnectGet(baseUrl+"/deployments/"+id, "is_deleted=true", jwtToken);
+          					deleteData = UrlCalls.urlConnectGet(getApiUrl()+"/deployments/"+id, "is_deleted=true", getJwtToken());
           					JSONObject tmpjo1 = (JSONObject)parser.parse(deleteData);
           					if (tmpjo1.get("data")!=null) {
           						String status = (String)((JSONObject)((JSONObject)tmpjo1.get("data")).get("status")).get("state");
@@ -146,7 +154,7 @@ public class ConfigValidateProgressBar implements IRunnableWithProgress {
           	monitor.subTask("Initial Deployment ...");
         	// do the initial app deploy and get the deployId
         	query = "{ \"data\": {\"release_id\": \""+rd.getRelease().getId()+"\", \"name\": \""+rd.getRepositoryBranch()+"-deploy\", \"loc_deploy_id\": \""+rd.getDeployLoc().getId()+"\",\"components\": [{\"services\": [{\"name\": \""+rd.getArtifact().getComponentName()+"\",\"component_service_id\":\""+rd.getArtifact().getComponentServiceId()+"\",\"overrides\": {\"build\": {\"artifacts\": {\"code\": \""+artifactId+"\"}}}}],\"stack_component_id\": \""+rd.getArtifact().getStackComponentId()+"\"}]}}";
-          	deployData = UrlCalls.urlConnectPost(baseUrl+"/deployments", query, jwtToken);
+          	deployData = UrlCalls.urlConnectPost(getApiUrl()+"/deployments", query, getJwtToken());
           	jo1 = (JSONObject)parser.parse(deployData);
           	String deployId;          	
           	String deployName;
@@ -156,7 +164,7 @@ public class ConfigValidateProgressBar implements IRunnableWithProgress {
           		deployId = (String)ja.get("deployment_id");
 
             	query = "";
-              	deployData = UrlCalls.urlConnectGet(baseUrl+"/deployments/"+deployId, query, jwtToken);
+              	deployData = UrlCalls.urlConnectGet(getApiUrl()+"/deployments/"+deployId, query, getJwtToken());
               	jo1 = (JSONObject)parser.parse(deployData);
               	ja = ((JSONObject)jo1.get("data"));
               	
@@ -178,7 +186,6 @@ public class ConfigValidateProgressBar implements IRunnableWithProgress {
           	redeployData.setRepositoryOwner(rd.getRepositoryOwner());
           	redeployData.setRepositoryName(rd.getRepositoryName());
           	redeployData.setRepositoryBranch(rd.getRepositoryBranch());
-          	
       		monitor.done(); 
       		
         } catch (Exception e) { 

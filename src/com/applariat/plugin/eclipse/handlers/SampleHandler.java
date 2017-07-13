@@ -1,12 +1,5 @@
 package com.applariat.plugin.eclipse.handlers;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -21,28 +14,9 @@ public class SampleHandler extends AbstractHandler {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);		
 
 		// read config information
-		AppLariatEclipsePlugin aep = new AppLariatEclipsePlugin();
-		File configFile = aep.getStateLocation().append(aep.getFilename()).toFile();
-		RedeployData rdd=null;
-		if (configFile.exists()) {
-			try(
-				InputStream file = new FileInputStream(configFile);
-			    InputStream buffer = new BufferedInputStream(file);
-			    ObjectInput input = new ObjectInputStream (buffer);
-			    ){
-			      //deserialize the List
-			      rdd = (RedeployData)input.readObject();
-			      //display its data
-//			      System.out.println("Deploy = "+rdd.getDeployData().getName()+"  Artifact="+rdd.getArtifactData().getName());
-			} catch(Exception e){
-				MessageDialog.openInformation(window.getShell(),"appLariat","Error reading config information. "+e.toString());
-				return null;
-			}
-		} else {
-			MessageDialog.openInformation(window.getShell(),"appLariat","Please configure deployment first through the Config menu. ");
-			return null;			
-		}
-		
+		RedeployData rdd=RedeployData.readRedeployDataFromFile(window);
+		if (rdd==null) { return null; }
+	
 		// first read the data from the deploy config dialog
 		MyTitleAreaDialog dialog = new MyTitleAreaDialog(window.getShell());
 		dialog.create();

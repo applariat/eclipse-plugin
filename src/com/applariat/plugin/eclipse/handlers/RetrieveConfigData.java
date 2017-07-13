@@ -17,10 +17,16 @@ public class RetrieveConfigData implements IRunnableWithProgress {
 	List<ReleaseData> releases = new ArrayList<ReleaseData>();
 	List<DeployLocationData> deployLocList = new ArrayList<DeployLocationData>();
 
+	RedeployData rdd; 
+	
 	String errorMessage=null;
 	boolean error=false;
-	String jwtToken;
 	
+	public RetrieveConfigData(RedeployData rdd) {
+		super();
+		this.rdd = rdd;
+	}
+
 	public boolean isError() {
 		return error;
 	}
@@ -53,14 +59,6 @@ public class RetrieveConfigData implements IRunnableWithProgress {
 		this.errorMessage = errorMessage;
 	}
 
-	public String getJwtToken() {
-		return jwtToken;
-	}
-
-	public void setJwtToken(String jwtToken) {
-		this.jwtToken = jwtToken;
-	}
-
 	public List<DeployLocationData> getDeployLocList() {
 		return deployLocList;
 	}
@@ -74,26 +72,16 @@ public class RetrieveConfigData implements IRunnableWithProgress {
 	}
 	
 	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-	    String baseUrl="$APL_API_BASE_URL";
+	    
         try { 
         	monitor.beginTask("Retrieving Application Information", 100); 
         	monitor.subTask("Connecting to appLariat API Service ...");
-        	
         	JSONParser parser = new JSONParser();        	
-        	baseUrl = UrlCalls.replaceApiHostPlaceholder(baseUrl);
-        	String jwtToken = UrlCalls.urlConnectRequestToken();
-        	if (jwtToken==null || jwtToken.length()<2) {        		
-        		setError(true);
-        		setErrorMessage("Unable to aquire authorization to access the API. Please check your credentials or connection.");
-        		return;
-        	}
-        	setJwtToken(jwtToken);
-        	monitor.worked(25); 
         	
         	monitor.subTask("Retrieving Application information ...");        	
         	// now grab all available releases 
         	String query = "metadata=true";
-          	String deployData = UrlCalls.urlConnectGet(baseUrl+"/releases", query, jwtToken);
+          	String deployData = UrlCalls.urlConnectGet(rdd.getApiUrl()+"/releases", query, rdd.getJwtToken());
           	JSONObject jo1 = (JSONObject)parser.parse(deployData);
           	
           	String releaseId;
@@ -108,7 +96,7 @@ public class RetrieveConfigData implements IRunnableWithProgress {
 	          		stackId=(String)((JSONObject)ja.get(j)).get("stack_id");
 	          		// get stack name
 	          		query = "metadata=true";
-  		          	String stackData = UrlCalls.urlConnectGet(baseUrl+"/stacks/"+stackId, query, jwtToken);
+  		          	String stackData = UrlCalls.urlConnectGet(rdd.getApiUrl()+"/stacks/"+stackId, query, rdd.getJwtToken());
   		          	JSONObject jo8 = (JSONObject)parser.parse(stackData);
   		          	String stackName;
   		          	if (((JSONObject)jo8.get("data")).get("meta_data")!=null) {
@@ -137,7 +125,7 @@ public class RetrieveConfigData implements IRunnableWithProgress {
 	          					String stackArtifactId = (String)artifacts.get("code");
 	          					// now look up this stack artifact ID to get its name
 	          					query = "";
-	          		          	String artifactData = UrlCalls.urlConnectGet(baseUrl+"/stack_artifacts/"+stackArtifactId, query, jwtToken);
+	          		          	String artifactData = UrlCalls.urlConnectGet(rdd.getApiUrl()+"/stack_artifacts/"+stackArtifactId, query, rdd.getJwtToken());
 	          		          	JSONObject jo9 = (JSONObject)parser.parse(artifactData);	
 	          		          	String artifactName = (String)((JSONObject)jo9.get("data")).get("artifact_name");
 	          					dd.addArtifact(stackArtifactId, artifactName, stackComponentId, componentServiceId, componentName);
@@ -153,11 +141,11 @@ public class RetrieveConfigData implements IRunnableWithProgress {
             	setErrorMessage("There are no Applications avaliable for release.");
             	return;
       		}
-          	monitor.worked(25);
+          	monitor.worked(50);
           	
           	monitor.subTask("Retrieving Deploy Locations ...");        
            	query = "status.state=available";
-          	String deployLoc = UrlCalls.urlConnectGet(baseUrl+"/loc_deploys", query, jwtToken);
+          	String deployLoc = UrlCalls.urlConnectGet(rdd.getApiUrl()+"/loc_deploys", query, rdd.getJwtToken());
           	jo1 = (JSONObject)parser.parse(deployLoc);
           	if (jo1.get("data")!=null && ((JSONArray)jo1.get("data")).size()>0) { 
           		JSONArray ja = ((JSONArray)jo1.get("data"));
