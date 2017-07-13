@@ -15,6 +15,8 @@ public class UrlHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);		
 
+		RedeployData.deleteRedeployDataFile();
+		
 		// read config information
 		RedeployData rdd = RedeployData.readRedeployDataFromFile(window);
 		if (rdd==null) { return null; }						

@@ -65,7 +65,7 @@ public class ProgressBarUrl implements IRunnableWithProgress {
 	}
 	
 	public String getLastUpdateTimeLocal() {
-		System.out.println(getLastUpdateTime());
+//		System.out.println(getLastUpdateTime());
 		int idx = this.lastUpdateTime.trim().indexOf(" ");
 		String subStr = this.lastUpdateTime.trim().substring(0, idx)+"T"+this.lastUpdateTime.trim().substring(idx+1);
 		ZonedDateTime localTime = ZonedDateTime.parse(subStr); 
@@ -170,7 +170,10 @@ public class ProgressBarUrl implements IRunnableWithProgress {
       		
         } catch (Exception e) { 
         	setError(true);
-        	setErrorMessage("An error occured during deployment: "+e.toString());
+        	StringBuffer sb = new StringBuffer("");
+        	StackTraceElement[] ste = e.getStackTrace();
+        	for (int i=0; i<ste.length; i++) {sb.append(ste[i]+"\n"); }
+        	setErrorMessage("An error occured during deployment: "+sb.toString());
         	throw new InvocationTargetException(e); 
         } 
   } 

@@ -159,7 +159,10 @@ public class ProgressBar implements IRunnableWithProgress {
       		
         } catch (Exception e) { 
         	setError(true);
-        	setErrorMessage("An error occured during deployment: "+e.toString());
+        	StringBuffer sb = new StringBuffer("");
+        	StackTraceElement[] ste = e.getStackTrace();
+        	for (int i=0; i<ste.length; i++) {sb.append(ste[i]+"\n"); }
+        	setErrorMessage("An error occured during deployment: "+sb.toString());
         	throw new InvocationTargetException(e); 
         } 
   }   
