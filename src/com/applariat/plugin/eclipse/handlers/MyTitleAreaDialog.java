@@ -22,6 +22,7 @@ public class MyTitleAreaDialog extends TitleAreaDialog {
     private List<String> deployTypeList= new ArrayList<String>();
     
     boolean silentDeploy=true;
+    boolean cancelPressed=false;
     
     public MyTitleAreaDialog(Shell parentShell) {
         super(parentShell);
@@ -79,8 +80,17 @@ public class MyTitleAreaDialog extends TitleAreaDialog {
         saveInput();
         super.okPressed();
     }
+    protected void cancelPressed() {
+        cancelPressed=true;
+        super.cancelPressed();
+    }
 
 	public boolean isSilentDeploy() {
 		return silentDeploy;
 	}
+
+	public boolean isCancelPressed() {
+		return cancelPressed;
+	}
+	
 }

@@ -23,6 +23,8 @@ public class MyLoginAreaDialog extends TitleAreaDialog {
     private String password;
     private RedeployData redeployData;
     
+    private boolean cancelPressed=false;
+    
     public MyLoginAreaDialog(Shell parentShell) {
         super(parentShell);             
     }
@@ -99,6 +101,11 @@ public class MyLoginAreaDialog extends TitleAreaDialog {
 		}
     }
 
+    protected void cancelPressed() {
+    	cancelPressed=true;
+    	super.cancelPressed();
+    }
+    
 	public String getUsername() {
 		return username;
 	}
@@ -122,4 +129,9 @@ public class MyLoginAreaDialog extends TitleAreaDialog {
 	public void setRedeployData(RedeployData redeployData) {
 		this.redeployData = redeployData;
 	}
+
+	public boolean isCancelPressed() {
+		return cancelPressed;
+	}
+	
 }

@@ -35,6 +35,7 @@ public class ConfigHandler extends AbstractHandler {
 				MyLoginAreaDialog lDialog = new MyLoginAreaDialog(window.getShell());
 				lDialog.create();
 				lDialog.open();
+				if (lDialog.isCancelPressed()) { return null; }
 				rdd = lDialog.getRedeployData();
 			} while(rdd.getJwtToken()==null);
 		}
@@ -54,6 +55,8 @@ public class ConfigHandler extends AbstractHandler {
 			MyComboAreaDialog dialog = new MyComboAreaDialog(window.getShell(), rcd.getReleases(), artifactData, rcd.getDeployLocList());
 			dialog.create();
 			dialog.open();		
+			
+			if (dialog.isCancelPressed()) { return null; }
 			
 			if (dialog.getErrorMessage()!=null && dialog.getErrorMessage().length()>1) {
 				MessageDialog.openInformation(

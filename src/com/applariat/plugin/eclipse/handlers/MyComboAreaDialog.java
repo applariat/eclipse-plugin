@@ -29,7 +29,7 @@ public class MyComboAreaDialog extends TitleAreaDialog {
     private Text txtRepositoryBranch;
 
     private InitialReleaseData initReleaseData = new InitialReleaseData();
-
+    private boolean cancelPressed = false;
 
     private List<ReleaseData> comboData;
     private List<String> artifactLocationNameList;
@@ -241,9 +241,17 @@ public class MyComboAreaDialog extends TitleAreaDialog {
         saveInput();
         super.okPressed();
     }
+    protected void cancelPressed() {
+        cancelPressed=true;
+        super.cancelPressed();
+    }
 
 	public InitialReleaseData getInitReleaseData() {
 		return initReleaseData;
+	}
+
+	public boolean isCancelPressed() {
+		return cancelPressed;
 	}
 
 }

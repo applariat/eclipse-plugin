@@ -21,6 +21,7 @@ public class SampleHandler extends AbstractHandler {
 		MyTitleAreaDialog dialog = new MyTitleAreaDialog(window.getShell());
 		dialog.create();
 		dialog.open();		
+		if (dialog.isCancelPressed()) { return null; }
 		
 		if (dialog.getErrorMessage()!=null && dialog.getErrorMessage().length()>1) {
 			MessageDialog.openInformation(
