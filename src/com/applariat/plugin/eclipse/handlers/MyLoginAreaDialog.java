@@ -1,5 +1,8 @@
 package com.applariat.plugin.eclipse.handlers;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
@@ -18,6 +21,7 @@ public class MyLoginAreaDialog extends TitleAreaDialog {
     
     private String username;
     private String password;
+    private RedeployData redeployData;
     
     public MyLoginAreaDialog(Shell parentShell) {
         super(parentShell);             
@@ -79,8 +83,20 @@ public class MyLoginAreaDialog extends TitleAreaDialog {
     }
 
     protected void okPressed() {
+    	setMessage("Validating credentials, please wait ...", IMessageProvider.INFORMATION);
         saveInput();
-        super.okPressed();
+        String authString = getUsername() + ":" + getPassword();
+		String authStringEnc = Base64.getEncoder().encodeToString(authString.getBytes(StandardCharsets.UTF_8));
+		RedeployData rdd = new RedeployData();
+		rdd.setAuthToken(authStringEnc);
+		// now validate this by getting a jwtToken. If not valid send them back to enter their username and password
+		RedeployData.initToken(rdd);
+		if (rdd.getJwtToken()==null) {
+			setMessage("Invalid Credentials, please try again ...", IMessageProvider.INFORMATION);
+		} else {
+			setRedeployData(rdd);
+			super.okPressed();
+		}
     }
 
 	public String getUsername() {
@@ -97,5 +113,13 @@ public class MyLoginAreaDialog extends TitleAreaDialog {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public RedeployData getRedeployData() {
+		return redeployData;
+	}
+
+	public void setRedeployData(RedeployData redeployData) {
+		this.redeployData = redeployData;
 	}
 }

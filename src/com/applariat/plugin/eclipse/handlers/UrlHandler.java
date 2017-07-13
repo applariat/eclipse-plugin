@@ -17,8 +17,8 @@ public class UrlHandler extends AbstractHandler {
 
 		// read config information
 		RedeployData rdd = RedeployData.readRedeployDataFromFile(window);
-		if (rdd==null) { return null; }
-						
+		if (rdd==null) { return null; }						
+		
 		ProgressBarUrl pb = new ProgressBarUrl(rdd);
 	    ProgressMonitorDialog pmd = new ProgressMonitorDialog(window.getShell());
 	    try {
@@ -45,7 +45,7 @@ public class UrlHandler extends AbstractHandler {
 	    		MessageDialog.openInformation(
 					window.getShell(),
 					"appLariat",
-					"Artifact is now deployed to "+rdd.getDeployData().getName()+". ");					
+					"Artifact is now deployed.");					
 	    	}
 	    } else {
 	    	MessageDialog.openInformation(

@@ -22,7 +22,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 
 public class RedeployData implements Serializable{
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;	
 
 	private DeployData deployData;
 	private ArtifactData artifactData;
@@ -212,5 +212,12 @@ public class RedeployData implements Serializable{
 					"Unable to write config data :  "+ex.getStackTrace().toString());			
 		}
 
+	}
+	
+	public static void deleteRedeployDataFile() {
+		AppLariatEclipsePlugin aep = new AppLariatEclipsePlugin();
+		File configFile = aep.getStateLocation().append(aep.getFilename()).toFile();		
+		
+		configFile.delete();
 	}
 }

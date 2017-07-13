@@ -2,9 +2,7 @@ package com.applariat.plugin.eclipse.handlers;
 
 // Written by: Mazda Marvasti, AppLariat Corp.
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -20,7 +18,7 @@ public class ConfigHandler extends AbstractHandler {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);		
-	
+		
 		RedeployData rdd = RedeployData.readRedeployDataFromFileForAuth();
 		boolean needCredentials = false;
 		if (rdd!=null && rdd.getAuthToken()!=null) { // now get the token for this auth
@@ -37,15 +35,7 @@ public class ConfigHandler extends AbstractHandler {
 				MyLoginAreaDialog lDialog = new MyLoginAreaDialog(window.getShell());
 				lDialog.create();
 				lDialog.open();
-				String authString = lDialog.getUsername() + ":" + lDialog.getPassword();
-				String authStringEnc = Base64.getEncoder().encodeToString(authString.getBytes(StandardCharsets.UTF_8));
-				rdd = new RedeployData();
-				rdd.setAuthToken(authStringEnc);
-				// now validate this by getting a jwtToken. If not valid send them back to enter their username and password
-				RedeployData.initToken(rdd);
-				if (rdd.getJwtToken()==null) {
-					MessageDialog.openInformation(window.getShell(),"appLariat", "Invalid username/password. Please re-enter you appLariat credentials.");
-				}
+				rdd = lDialog.getRedeployData();
 			} while(rdd.getJwtToken()==null);
 		}
 		

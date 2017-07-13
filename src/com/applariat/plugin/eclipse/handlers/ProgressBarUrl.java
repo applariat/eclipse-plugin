@@ -16,7 +16,7 @@ import org.json.simple.parser.JSONParser;
 
 public class ProgressBarUrl implements IRunnableWithProgress { 
     
-	private RedeployData rdd;
+	RedeployData rdd;
 	
 	public ProgressBarUrl(RedeployData rdd) {
 		this.rdd=rdd;
@@ -54,15 +54,6 @@ public class ProgressBarUrl implements IRunnableWithProgress {
 
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
-	}
-	
-	
-	public RedeployData getRdd() {
-		return rdd;
-	}
-
-	public void setRdd(RedeployData rdd) {
-		this.rdd = rdd;
 	}
 
 	public String getLastUpdateTime() {
@@ -111,8 +102,7 @@ public class ProgressBarUrl implements IRunnableWithProgress {
         	JSONParser parser = new JSONParser();
         	
         	monitor.beginTask("Retrieving Application Information", 100); 
-        
-        	monitor.worked(25); 
+        	monitor.worked(25);
         	
         	monitor.subTask("Retrieving deployment information ...");
         	String query = "";
@@ -174,7 +164,7 @@ public class ProgressBarUrl implements IRunnableWithProgress {
       			}
       		}
           	
-      		monitor.worked(50); 
+      		monitor.worked(45); 
       		
       		monitor.done(); 
       		
