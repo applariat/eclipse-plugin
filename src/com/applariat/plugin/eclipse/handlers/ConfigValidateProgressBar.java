@@ -194,7 +194,8 @@ public class ConfigValidateProgressBar implements IRunnableWithProgress {
         	StackTraceElement[] ste = e.getStackTrace();
         	for (int i=0; i<ste.length; i++) {sb.append(ste[i]+"\n"); }
         	setErrorMessage("An error occured during deployment: "+sb.toString());
-        	throw new InvocationTargetException(e); 
+        	return;
+        	//throw new InvocationTargetException(e); 
         } 
   } 
   

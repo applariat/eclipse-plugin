@@ -132,7 +132,7 @@ public class MyComboAreaDialog extends TitleAreaDialog {
         	    }
                 comboArtifactName.removeAll();
                 for (ArtifactData ad: ddSelected.getArtifacts()) {
-                	comboArtifactName.add(ad.getComponentName()+" : "+ad.getName());
+                	comboArtifactName.add(ad.getComponentName()+" ; "+ad.getName());
                 }
                 comboArtifactName.select(0);
         	}
@@ -157,7 +157,7 @@ public class MyComboAreaDialog extends TitleAreaDialog {
         	}
         }
         for (ArtifactData ad: artifacts) {
-        	comboArtifactName.add(ad.getComponentName()+" : "+ad.getName());
+        	comboArtifactName.add(ad.getComponentName()+" ; "+ad.getName());
         }
         comboArtifactName.select(0);
     }
@@ -201,8 +201,8 @@ public class MyComboAreaDialog extends TitleAreaDialog {
 
     private void saveInput() {
         String tmpReleaseName = comboReleaseName.getText();
-        String tmpComponentName = comboArtifactName.getText().split(":")[0].trim();
-        String tmpArtifactName = comboArtifactName.getText().split(":")[1].trim();
+        String tmpComponentName = comboArtifactName.getText().split(";")[0].trim();
+        String tmpArtifactName = comboArtifactName.getText().split(";")[1].trim();
         String tmpArtifactLocName = comboArtifactLocationName.getText(); 
         String tmpDeployLocName = comboDeployLocationName.getText();  
         

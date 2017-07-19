@@ -11,6 +11,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+
+import javax.net.ssl.HttpsURLConnection;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -31,15 +34,16 @@ public class UrlCalls {
 			} else {
 				return "https://api.applariat.io/v1";
 			}
-		}
-		return url;
+		} else {
+			return "https://api.applariat.io/v1";
+		}	
 	}
 	
 	public static String urlConnectRequestToken(String apiUrl, String authStringEnc) {
 		String baseUrl = apiUrl + "/request_token";
-		HttpURLConnection connection = null;
+		HttpsURLConnection connection = null;
 		try {
-			connection = (HttpURLConnection)new URL(baseUrl).openConnection();
+			connection = (HttpsURLConnection)new URL(baseUrl).openConnection();
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Authorization", "Basic " + authStringEnc);
 			InputStream response = connection.getInputStream();
@@ -52,6 +56,7 @@ public class UrlCalls {
 			return access_token; 
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println("URL: "+baseUrl);
 			if (connection ==null) {
 				System.out.println("Failed url="+baseUrl+"      For reason="+e.toString());
 			} else {

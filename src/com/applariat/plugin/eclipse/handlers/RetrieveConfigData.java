@@ -16,6 +16,7 @@ public class RetrieveConfigData implements IRunnableWithProgress {
 
 	List<ReleaseData> releases = new ArrayList<ReleaseData>();
 	List<DeployLocationData> deployLocList = new ArrayList<DeployLocationData>();
+	List<ArtifactLocationData> artifactLocList = new ArrayList<ArtifactLocationData>();
 
 	RedeployData rdd; 
 	
@@ -106,9 +107,9 @@ public class RetrieveConfigData implements IRunnableWithProgress {
   		          	}
   		          	
 	          		if (((JSONObject)ja.get(j)).get("meta_data")!=null) {
-	          			releaseName= stackName+": "+(String)((JSONObject)((JSONObject)ja.get(j)).get("meta_data")).get("display_name")+": v"+releaseTag;
+	          			releaseName= stackName+" ; "+(String)((JSONObject)((JSONObject)ja.get(j)).get("meta_data")).get("display_name")+" ; v"+releaseTag;
 	          		} else {
-	          			releaseName = stackName+": "+releaseId+": v"+releaseTag;
+	          			releaseName = stackName+" ; "+releaseId+" ; v"+releaseTag;
 	          		}
 	          		JSONArray ja2 = (JSONArray)((JSONObject)ja.get(j)).get("components");
 	          		// loop through each component to see which one has an artifact.
