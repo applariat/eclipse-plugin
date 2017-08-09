@@ -4,14 +4,10 @@ package com.applariat.plugin.eclipse.handlers;
 
 public class InitialReleaseData {
 
-	ReleaseData release;
-	ArtifactData artifact;
-	DeployLocationData deployLoc;
-	private String newArtifactLocation;
-	private String repositoryOwner;
-	private String repositoryName;
-    private String repositoryBranch;
-    
+	private ReleaseData release;
+	private ArtifactData artifact;
+	private DeployLocationData deployLoc;
+	private SelectedArtifactLocation artifactLoc;
     
 	public InitialReleaseData() {
 		super();
@@ -34,38 +30,6 @@ public class InitialReleaseData {
 		this.artifact = artifact;
 	}
 
-	public String getNewArtifactLocation() {
-		return newArtifactLocation;
-	}
-
-	public void setNewArtifactLocation(String newArtifactLocation) {
-		this.newArtifactLocation = newArtifactLocation;
-	}
-
-	public String getRepositoryOwner() {
-		return repositoryOwner;
-	}
-
-	public void setRepositoryOwner(String repositoryOwner) {
-		this.repositoryOwner = repositoryOwner;
-	}
-
-	public String getRepositoryName() {
-		return repositoryName;
-	}
-
-	public void setRepositoryName(String repositoryName) {
-		this.repositoryName = repositoryName;
-	}
-
-	public String getRepositoryBranch() {
-		return repositoryBranch;
-	}
-
-	public void setRepositoryBranch(String repositoryBranch) {
-		this.repositoryBranch = repositoryBranch;
-	}
-
 	public DeployLocationData getDeployLoc() {
 		return deployLoc;
 	}
@@ -73,5 +37,12 @@ public class InitialReleaseData {
 	public void setDeployLoc(DeployLocationData deployLoc) {
 		this.deployLoc = deployLoc;
 	}
-	
+
+	public SelectedArtifactLocation getArtifactLoc() {
+		return artifactLoc;
+	}
+
+	public void setArtifactLoc(SelectedArtifactLocation artifactLoc) {
+		this.artifactLoc = artifactLoc;
+	}	
 }

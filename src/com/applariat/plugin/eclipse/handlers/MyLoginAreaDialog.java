@@ -64,7 +64,7 @@ public class MyLoginAreaDialog extends TitleAreaDialog {
  private void createPasswordType(Composite container) {
         
         Label lbtRepPassword = new Label(container, SWT.NONE);
-        lbtRepPassword.setText("Username");
+        lbtRepPassword.setText("Password");
 
         GridData dataRepPassword = new GridData();
         dataRepPassword.grabExcessHorizontalSpace = true;

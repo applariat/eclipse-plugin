@@ -22,7 +22,12 @@
             name="Configure"
             categoryId="com.applariat.plugin.eclipse.commands.category"
             id="com.applariat.plugin.eclipse.commands.configure">
-      </command>      
+      </command>
+            <command
+            name="Logout"
+            categoryId="com.applariat.plugin.eclipse.commands.category"
+            id="com.applariat.plugin.eclipse.commands.logout">
+      </command>            
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -38,27 +43,39 @@
             commandId="com.applariat.plugin.eclipse.commands.configure"
             class="com.applariat.plugin.eclipse.handlers.ConfigHandler">
       </handler>
+            <handler
+            commandId="com.applariat.plugin.eclipse.commands.logout"
+            class="com.applariat.plugin.eclipse.handlers.LogoutHandler">
+      </handler>
+      
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
       <key
             commandId="com.applariat.plugin.eclipse.commands.deployApp"
             contextId="org.eclipse.ui.contexts.window"
-            sequence="M1+6"
+            sequence="M1+4"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
       <key
             commandId="com.applariat.plugin.eclipse.commands.appUrl"
             contextId="org.eclipse.ui.contexts.window"
-            sequence="M2+6"
+            sequence="M1+5"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
       <key
             commandId="com.applariat.plugin.eclipse.commands.configure"
             contextId="org.eclipse.ui.contexts.window"
-            sequence="M3+6"
+            sequence="M1+6"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
+            <key
+            commandId="com.applariat.plugin.eclipse.commands.logout"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+7"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+      
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -85,7 +102,14 @@
                   commandId="com.applariat.plugin.eclipse.commands.configure"
                   mnemonic="S"
                   id="com.applariat.plugin.eclipse.menus.configure">
+            </command>
+            <command
+                  label="Logout"
+                  commandId="com.applariat.plugin.eclipse.commands.logout"
+                  mnemonic="S"
+                  id="com.applariat.plugin.eclipse.menus.logout">
             </command>            
+                        
          </menu>
       </menuContribution>
       <menuContribution
@@ -110,6 +134,13 @@
                   tooltip="Configure"
                   id="com.applariat.plugin.eclipse.toolbars.configure">
             </command>
+            <command
+                  commandId="com.applariat.plugin.eclipse.commands.logout"
+                  icon="icons/sample.gif"
+                  tooltip="Logout"
+                  id="com.applariat.plugin.eclipse.toolbars.logout">
+            </command>
+            
          </toolbar>
       </menuContribution>
    </extension>

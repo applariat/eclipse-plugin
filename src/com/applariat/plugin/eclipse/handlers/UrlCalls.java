@@ -8,9 +8,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.cert.X509Certificate;
 import java.util.Base64;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509TrustManager;
+
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -31,15 +40,52 @@ public class UrlCalls {
 			} else {
 				return "https://api.applariat.io/v1";
 			}
-		}
-		return url;
+		} else {
+			return "https://api.applariat.io/v1";
+		}	
+	}
+	
+	private static URL getCustomConnection(String urlString) {
+		// Create a trust manager that does not validate certificate chains
+		X509TrustManager[] trustAllCerts = new X509TrustManager[] { 
+		    new X509TrustManager() {     
+		        public java.security.cert.X509Certificate[] getAcceptedIssuers() { 
+		            return new X509Certificate[0];
+		        } 
+		        public void checkClientTrusted( 
+		            java.security.cert.X509Certificate[] certs, String authType) {
+		            } 
+		        public void checkServerTrusted( 
+		            java.security.cert.X509Certificate[] certs, String authType) {
+		        }
+		    } 
+		}; 
+
+		// Install the all-trusting trust manager
+		try {
+		    SSLContext sc = SSLContext.getInstance("SSL"); 
+		    sc.init(null, trustAllCerts, new java.security.SecureRandom()); 
+		    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+		} catch (GeneralSecurityException e) {
+			e.printStackTrace();
+		} 
+		// Now you can access an https URL without having the certificate in the truststore
+		try { 
+		    URL url = new URL(urlString);
+		    return url;
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} 
+		return null;
 	}
 	
 	public static String urlConnectRequestToken(String apiUrl, String authStringEnc) {
 		String baseUrl = apiUrl + "/request_token";
-		HttpURLConnection connection = null;
+		HttpsURLConnection connection = null;
+		URL urlCon = getCustomConnection(baseUrl);
+		if (urlCon==null) { return null; }
 		try {
-			connection = (HttpURLConnection)new URL(baseUrl).openConnection();
+			connection = (HttpsURLConnection)urlCon.openConnection();
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Authorization", "Basic " + authStringEnc);
 			InputStream response = connection.getInputStream();
@@ -52,6 +98,7 @@ public class UrlCalls {
 			return access_token; 
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println("URL: "+baseUrl);
 			if (connection ==null) {
 				System.out.println("Failed url="+baseUrl+"      For reason="+e.toString());
 			} else {
@@ -74,7 +121,7 @@ public class UrlCalls {
 		try {
 			String authorization = "Bearer " + jwtToken;
 			
-			connection = (HttpURLConnection)new URL(baseUrl).openConnection();
+			connection = (HttpURLConnection)getCustomConnection(baseUrl).openConnection();
 			connection.setRequestMethod("POST");
 			connection.setDoOutput(true);
 			connection.setRequestProperty("Accept",  "application/json");
@@ -109,9 +156,9 @@ public class UrlCalls {
 			String authorization = "Bearer " + jwtToken;
 			
 			if (query!=null && query.length()>0) {
-				connection = (HttpURLConnection)new URL(baseUrl+"?"+query).openConnection();
+				connection = (HttpURLConnection)getCustomConnection(baseUrl+"?"+query).openConnection();
 			} else {
-				connection = (HttpURLConnection)new URL(baseUrl).openConnection();
+				connection = (HttpURLConnection)getCustomConnection(baseUrl).openConnection();
 			}
 			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Accept-Charset",  "application/json");
@@ -144,9 +191,9 @@ public class UrlCalls {
 			String authorization = "Bearer " + jwtToken;
 			
 			if (query!=null && query.length()>0) {
-				connection = (HttpURLConnection)new URL(baseUrl+"?"+query).openConnection();
+				connection = (HttpURLConnection)getCustomConnection(baseUrl+"?"+query).openConnection();
 			} else {
-				connection = (HttpURLConnection)new URL(baseUrl).openConnection();
+				connection = (HttpURLConnection)getCustomConnection(baseUrl).openConnection();
 			}
 			connection.setRequestMethod("DELETE");
 			connection.setRequestProperty("Accept-Charset",  "application/json");
@@ -178,7 +225,7 @@ public class UrlCalls {
 		try {
 			String authorization = "Bearer " + jwtToken;
 			
-			connection = (HttpURLConnection)new URL(baseUrl).openConnection();
+			connection = (HttpURLConnection)getCustomConnection(baseUrl).openConnection();
 			connection.setRequestMethod("PUT");
 			connection.setDoOutput(true);
 			connection.setRequestProperty("Accept",  "application/json");

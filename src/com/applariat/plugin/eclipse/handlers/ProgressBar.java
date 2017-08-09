@@ -79,7 +79,7 @@ public class ProgressBar implements IRunnableWithProgress {
         	monitor.beginTask("Deploying Application", 100); 
         
         	monitor.subTask("Deploying application ...");
-          	String query = "{\"data\": {\"command\": \"override\",\"components\": [{\"stack_component_id\": \""+rdd.getArtifactData().getStackComponentId()+"\",\"services\": [{\"component_service_id\": \""+rdd.getArtifactData().getComponentServiceId()+"\",\"build\": {\"buildvars\": [{\"key\": \"REBUILD_NUM\", \"value\":\""+rdd.getNewBuildHash()+"\"}]}}]}]}}";
+          	String query = "{\"data\": {\"command\": \"override\",\"components\": [{\"stack_component_id\": \""+rdd.getArtifactData().getStackComponentId()+"\",\"services\": [{\"name\": \""+rdd.getArtifactData().getComponentName()+"\",\"build\": {\"buildvars\": [{\"key\": \"REBUILD_NUM\", \"value\":\""+rdd.getNewBuildHash()+"\"}]}}]}]}}";
           	String deployData = UrlCalls.urlConnectPut(rdd.getApiUrl()+"/deployments/"+rdd.getDeployData().getId(), query, rdd.getJwtToken());
           	if (deployData==null) {
           		setError(true);

@@ -185,6 +185,8 @@ public class RedeployData implements Serializable{
 		String jwtToken = UrlCalls.urlConnectRequestToken(apiUrl, rdd.getAuthToken());
 		// if jwtToken is null we need to have a different credentials as it is no longer valid.
 		if (jwtToken ==null) {
+			rdd.setAuthToken(null);
+			RedeployData.writeRedeployDataToFile(rdd, window); // this is so that from config we know to ask for username and password again.
 			MessageDialog.openInformation(
 					window.getShell(),
 					"appLariat",

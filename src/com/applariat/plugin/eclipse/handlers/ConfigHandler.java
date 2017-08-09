@@ -2,9 +2,6 @@ package com.applariat.plugin.eclipse.handlers;
 
 // Written by: Mazda Marvasti, AppLariat Corp.
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -48,11 +45,7 @@ public class ConfigHandler extends AbstractHandler {
 	    	e.printStackTrace();
 	    }
 		if (!rcd.isError()) {
-			List<String> artifactData = new ArrayList<String>();
-			artifactData.add("GitHub");
-//			artifactData.add("BitBucket");
-			
-			MyComboAreaDialog dialog = new MyComboAreaDialog(window.getShell(), rcd.getReleases(), artifactData, rcd.getDeployLocList());
+			MyComboAreaDialog dialog = new MyComboAreaDialog(window.getShell(), rcd.getReleases(), rcd.getDeployLocList(), rcd.getArtifactLocSelectionList(), rdd.getApiUrl(), rdd.getJwtToken());
 			dialog.create();
 			dialog.open();		
 			
@@ -84,7 +77,7 @@ public class ConfigHandler extends AbstractHandler {
 			MessageDialog.openInformation(
 					window.getShell(),
 					"appLariat",
-					"Config Data Saved:  Deploy Name = "+redeployData.getDeployData().getName()+",   Artifact to Replace = "+redeployData.getArtifactData().getName());
+					"Currently deploying the application. Check it's status by going to the 'App URL' menu.");
 			
 		} else {
 			MessageDialog.openInformation(

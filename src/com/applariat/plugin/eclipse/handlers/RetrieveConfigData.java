@@ -16,6 +16,7 @@ public class RetrieveConfigData implements IRunnableWithProgress {
 
 	List<ReleaseData> releases = new ArrayList<ReleaseData>();
 	List<DeployLocationData> deployLocList = new ArrayList<DeployLocationData>();
+	List<ArtifactLocationSelectionData> artifactLocSelectionList = new ArrayList<ArtifactLocationSelectionData>();
 
 	RedeployData rdd; 
 	
@@ -71,6 +72,15 @@ public class RetrieveConfigData implements IRunnableWithProgress {
 		this.deployLocList.add(new DeployLocationData(id, name));
 	}
 	
+	
+	public List<ArtifactLocationSelectionData> getArtifactLocSelectionList() {
+		return artifactLocSelectionList;
+	}
+
+	public void setArtifactLocSelectionList(List<ArtifactLocationSelectionData> artifactLocSelectionList) {
+		this.artifactLocSelectionList = artifactLocSelectionList;
+	}
+
 	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 	    
         try { 
@@ -106,9 +116,9 @@ public class RetrieveConfigData implements IRunnableWithProgress {
   		          	}
   		          	
 	          		if (((JSONObject)ja.get(j)).get("meta_data")!=null) {
-	          			releaseName= stackName+": "+(String)((JSONObject)((JSONObject)ja.get(j)).get("meta_data")).get("display_name")+": v"+releaseTag;
+	          			releaseName= stackName+" ; "+(String)((JSONObject)((JSONObject)ja.get(j)).get("meta_data")).get("display_name")+" ; v"+releaseTag;
 	          		} else {
-	          			releaseName = stackName+": "+releaseId+": v"+releaseTag;
+	          			releaseName = stackName+" ; "+releaseId+" ; v"+releaseTag;
 	          		}
 	          		JSONArray ja2 = (JSONArray)((JSONObject)ja.get(j)).get("components");
 	          		// loop through each component to see which one has an artifact.
@@ -144,14 +154,14 @@ public class RetrieveConfigData implements IRunnableWithProgress {
           	monitor.worked(50);
           	
           	monitor.subTask("Retrieving Deploy Locations ...");        
-           	query = "status.state=available";
+           	query = "status.state=available&metadata=true";
           	String deployLoc = UrlCalls.urlConnectGet(rdd.getApiUrl()+"/loc_deploys", query, rdd.getJwtToken());
           	jo1 = (JSONObject)parser.parse(deployLoc);
           	if (jo1.get("data")!=null && ((JSONArray)jo1.get("data")).size()>0) { 
           		JSONArray ja = ((JSONArray)jo1.get("data"));
           		for (int j=0; j<ja.size(); j++) {
 	          		String deployLocId = (String)((JSONObject)ja.get(j)).get("id");
-	          		String deployLocName = (String)((JSONObject)ja.get(j)).get("name");
+	          		String deployLocName = (String)((JSONObject)((JSONObject)ja.get(j)).get("meta_data")).get("display_name");
 	          		this.addDeployLocation(deployLocId, deployLocName);
           		} 
           	} else {
@@ -160,6 +170,35 @@ public class RetrieveConfigData implements IRunnableWithProgress {
           	}
           	
       		monitor.worked(25);
+      		
+      		// retrieve artifact locations
+          	monitor.subTask("Retrieving Artifact Locations ...");        
+           	query = "loc_artifacts_type=github&metadata=true";
+          	String artifactLoc = UrlCalls.urlConnectGet(rdd.getApiUrl()+"/loc_artifacts", query, rdd.getJwtToken());
+          	jo1 = (JSONObject)parser.parse(artifactLoc);
+          	if (jo1.get("data")!=null && ((JSONArray)jo1.get("data")).size()>0) { 
+          		JSONArray ja = ((JSONArray)jo1.get("data"));
+          		for (int j=0; j<ja.size(); j++) {
+	          		String displayName = (String)((JSONObject)ja.get(j)).get("name");
+	          		String id = (String)((JSONObject)ja.get(j)).get("id");
+	          		ArtifactLocationSelectionData alsd = new ArtifactLocationSelectionData(displayName, id);
+	          		
+	          		// now get all the branches of this id
+	               	query = "browse=owner";
+	              	String oneArtifactLoc = UrlCalls.urlConnectGet(rdd.getApiUrl()+"/loc_artifacts/"+id, query, rdd.getJwtToken());
+	              	JSONObject jo2 = (JSONObject)parser.parse(oneArtifactLoc);
+	              	JSONArray ja3 = (JSONArray)((JSONObject)((JSONObject)jo2.get("data")).get("browse")).get("list");
+	                for(int k=0; k<ja3.size(); k++) {
+	                	String val = (String)((JSONObject)ja3.get(k)).get("value");
+	                	alsd.addOwner(val);
+	                }
+	              	this.artifactLocSelectionList.add(alsd);
+          		} 
+          	} else {
+          		setError(true);
+          		setErrorMessage("Unable to retrieve list of available deploy locations.");
+          	}
+          	monitor.worked(25);
       		monitor.done(); 
         } catch (Exception e) {
         	setError(true);
